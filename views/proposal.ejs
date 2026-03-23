@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlaceOS CampusOS — Proposal for <%= quote.company_name %></title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/lucide@0.309.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<!-- Limited Time Offer Banner -->
+<% if (quote.status === 'pending') {
+  const createdDate = new Date(quote.created_at);
+  const expiryDate = new Date(createdDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+  const earlyBirdDate = new Date(createdDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+%>
+<div class="limited-offer-banner" id="offerBanner">
+  <div class="container" style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+    <div style="flex:1;">
+      <div class="banner-label">Limited Time Offer</div>
+      <div class="banner-text">Sign within 72 hours & receive <strong>$2,000 implementation credit</strong></div>
+    </div>
+    <div style="display:flex; align-items:center; gap:20px;">
+      <div id="countdown" style="display:flex; gap:8px; font-weight:600; font-size:0.95em;"></div>
+      <a href="#acceptSection" class="banner-cta">Sign Now</a>
+    </div>
+  </div>
+</div>
+<% } %>
+
+<!-- Header -->
+<div class="proposal-header">
+  <div class="logo">Place<span>OS</span></div>
+  <h1>CampusOS Proposal</h1>
+  <div class="company"><%= quote.company_name %></div>
+  <div class="date">
+    Prepared for <strong><%= quote.contact_name %></strong> &middot; <%= new Date(quote.created_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) %>
+  </div>
+  <% if (quote.status === 'accepted') { %>
+    <div class="proposal-badge badge-accepted">Accepted</div>
+  <% } else { %>
+    <div class="proposal-badge badge-pending">Offer Expires in 7 Days</div>
+  <% } %>
+</div>
+
+<div class="proposal-body">
+
+  <!-- Executive Summary -->
+  <div class="proposal-card">
+    <h2>Executive Summary</h2>
+    <p>PlaceOS CampusOS is a comprehensive smart campus management platform that transforms how <strong><%= quote.company_name %></strong> manages its campus environment. From bookable spaces and AV control to visitor management and environmental monitoring, CampusOS provides a unified, intelligent layer across your entire campus.</p>
+    <p>This proposal covers an annual software licence for your configured campus of <strong><%= quote.num_bookable_spaces %> bookable spaces</strong>, <strong><%= quote.num_floors %> floors</strong><% if (quote.num_parking_spaces > 0) { %>, <strong><%= quote.num_parking_spaces %> parking spaces</strong><% } %><% if (quote.num_av_rooms > 0) { %>, <strong><%= quote.num_av_rooms %> AV rooms</strong><% } %> across <strong><%= quote.num_buildings %> building(s)</strong>.</p>
+  </div>
+
+  <!-- Features Included -->
+  <div class="proposal-card">
+    <h2>What's Included</h2>
+    <div class="features-included">
+      <% if (quote.num_bookable_spaces > 0) { %>
+      <div class="feature-item">
+        <div class="fi-icon"><i data-lucide="calendar-range"></i></div>
+        <div><h4>Bookable Spaces</h4><p>Intelligent scheduling for lecture halls, seminar rooms, labs, libraries, and collaborative zones with real-time availability.</p></div>
+      </div>
+      <% } %>
+      <% if (quote.num_floors > 0) { %>
+      <div class="feature-item">
+        <div class="fi-icon"><i data-lucide="bar-chart-3"></i></div>
+        <div><h4>Space Utilisation</h4><p>Real-time occupancy analytics, heatmaps, and utilisation dashboards powered by sensor data across campus.</p></div>
+      </div>
+      <div class="feature-item">
+        <div class="fi-icon"><i data-lucide="thermometer"></i></div>
+        <div><h4>Environmental Monitoring</h4><p>Track temperature, humidity, CO2, and air quality across every floor for comfort and compliance.</p></div>
+      </div>
+      <% } %>
+      <% if (quote.num_parking_spaces > 0) { %>
+      <div class="feature-item">
+        <div class="fi-icon"><i data-lucide="car"></i></div>
+        <div><h4>Campus Parking</h4><p>Automated parking allocation and booking for staff and students via mobile app.</p></div>
+      </div>
+      <% } %>
+      <% if (quote.num_av_rooms > 0) { %>
+      <div class="feature-item">
+        <div class="fi-icon"><i data-lucide="speaker"></i></div>
+        <div><h4>AV Control</h4><p>Automated AV management for lecture theatres — projectors, screens, microphones, and recording systems.</p></div>
+      </div>
+      <% } %>
+      <% if (quote.include_digital_signage) { %>
+      <div class="feature-item">
+        <div class="fi-icon"><i data-lucide="monitor"></i></div>
+        <div><h4>Digital Signage</h4><p>Campus wayfinding, room schedules, event announcements, and real-time information displays.</p></div>
+      </div>
+      <% } %>
+      <% if (quote.include_visitor_mgmt) { %>
+      <div class="feature-item">
+        <div class="fi-icon"><i data-lucide="user-check"></i></div>
+        <div><h4>Visitor Management</h4><p>Guest check-in, event registration, campus tours, host notifications, and compliance tracking.</p></div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Pricing Breakdown -->
+  <div class="proposal-card">
+    <h2>Annual Licence Pricing</h2>
+    <p style="color:#888; font-size:0.9em; margin-bottom:16px;">All pricing in USD, per annum, excluding GST.</p>
+    <table class="price-table">
+      <thead><tr><th>Feature</th><th>Quantity</th><th>Unit Price</th><th>Annual Total</th></tr></thead>
+      <tbody>
+        <% if (quote.num_bookable_spaces > 0) { %>
+        <tr><td>Bookable Spaces</td><td><%= quote.num_bookable_spaces %> spaces</td><td>$<%= PRICING.bookable_spaces.usd %>/space</td><td>$<%= (quote.num_bookable_spaces * PRICING.bookable_spaces.usd).toLocaleString() %></td></tr>
+        <% } %>
+        <% if (quote.num_floors > 0) { %>
+        <tr><td>Environmental Monitoring</td><td><%= quote.num_floors %> floors</td><td>$<%= PRICING.env_monitoring.usd.toLocaleString() %>/floor</td><td>$<%= (quote.num_floors * PRICING.env_monitoring.usd).toLocaleString() %></td></tr>
+        <tr><td>Space Utilisation</td><td><%= quote.num_floors %> floors</td><td>$<%= PRICING.space_util.usd.toLocaleString() %>/floor</td><td>$<%= (quote.num_floors * PRICING.space_util.usd).toLocaleString() %></td></tr>
+        <% } %>
+        <% if (quote.num_parking_spaces > 0) { %>
+        <tr><td>Campus Parking</td><td><%= quote.num_parking_spaces %> spaces</td><td>$<%= PRICING.campus_parking.usd %>/space</td><td>$<%= (quote.num_parking_spaces * PRICING.campus_parking.usd).toLocaleString() %></td></tr>
+        <% } %>
+        <% if (quote.num_av_rooms > 0) { %>
+        <tr><td>AV Control</td><td><%= quote.num_av_rooms %> rooms</td><td>$<%= PRICING.av_control.usd %>/room</td><td>$<%= (quote.num_av_rooms * PRICING.av_control.usd).toLocaleString() %></td></tr>
+        <% } %>
+        <% if (quote.include_digital_signage) { %>
+        <tr><td>Digital Signage</td><td><%= quote.num_buildings %> building(s)</td><td>$<%= PRICING.digital_signage.usd.toLocaleString() %>/building</td><td>$<%= (quote.num_buildings * PRICING.digital_signage.usd).toLocaleString() %></td></tr>
+        <% } %>
+        <% if (quote.include_visitor_mgmt) { %>
+        <tr><td>Visitor Management</td><td><%= quote.num_buildings %> building(s)</td><td>$<%= PRICING.visitor_mgmt.usd.toLocaleString() %>/building</td><td>$<%= (quote.num_buildings * PRICING.visitor_mgmt.usd).toLocaleString() %></td></tr>
+        <% } %>
+        <tr class="total-row"><td colspan="3">Subtotal</td><td>$<%= quote.subtotal.toLocaleString() %></td></tr>
+        <% if (quote.discount_pct > 0) { %>
+        <tr class="discount-row" style="background:#eef7f0;">
+          <td colspan="3">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="discount-badge"><%= (quote.discount_pct * 100) %>% OFF</span>
+              Volume Discount — You're Saving $<%= quote.discount_amount.toLocaleString() %>
+            </div>
+          </td>
+          <td style="color:#1a8a4a; font-weight:600;">&#8722;$<%= quote.discount_amount.toLocaleString() %></td>
+        </tr>
+        <% } %>
+        <tr class="grand-row"><td colspan="3">Total Annual Licence <% if (quote.discount_pct > 0) { %><span style="font-weight:normal; text-decoration:line-through; color:rgba(255,255,255,0.5); font-size:0.9em;">($<%= quote.subtotal.toLocaleString() %>)</span><% } %></td><td>$<%= quote.total_annual.toLocaleString() %> USD</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Setup Fees -->
+  <div class="proposal-card">
+    <h2>One-Time Setup Fees</h2>
+    <table class="price-table">
+      <thead><tr><th>Service</th><th>Detail</th><th>Cost (USD)</th></tr></thead>
+      <tbody>
+        <tr><td>Platform Configuration</td><td>Branding, data import, testing</td><td>$<%= quote.setup_config.toLocaleString() %></td></tr>
+        <tr><td>Map Creation</td><td><%= quote.num_floors %> floor map(s) x $1,000</td><td>$<%= quote.setup_maps.toLocaleString() %></td></tr>
+        <tr><td>Integration & Onboarding</td><td>Directory & calendar sync</td><td>$<%= quote.setup_integration.toLocaleString() %></td></tr>
+        <tr class="grand-row"><td colspan="2">Total Setup</td><td>$<%= quote.setup_total.toLocaleString() %> USD</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Payment Milestones -->
+  <div class="proposal-card">
+    <h2>Payment Milestones</h2>
+    <div class="milestone-list">
+      <div class="milestone">
+        <div class="milestone-num">1</div>
+        <div><h4>Signing of Contract</h4><p>Annual licence fee upfront + 50% of setup services ($<%= (quote.total_annual + quote.setup_total * 0.5).toLocaleString() %> USD)</p></div>
+      </div>
+      <div class="milestone">
+        <div class="milestone-num">2</div>
+        <div><h4>Handover for Testing</h4><p>25% of setup services ($<%= (quote.setup_total * 0.25).toLocaleString() %> USD)</p></div>
+      </div>
+      <div class="milestone">
+        <div class="milestone-num">3</div>
+        <div><h4>Completion of Testing</h4><p>Final 25% of setup services ($<%= (quote.setup_total * 0.25).toLocaleString() %> USD)</p></div>
+      </div>
+      <div class="milestone">
+        <div class="milestone-num">4</div>
+        <div><h4>Annual Renewal</h4><p>12-month licence renewal at agreed annual rate.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accept / Signature -->
+  <% if (quote.status === 'pending') { %>
+
+  <!-- Early Bird Bonus Callout -->
+  <div class="bonus-card">
+    <div class="bonus-badge">BONUS OFFER</div>
+    <h3>Sign Within 72 Hours & Get:</h3>
+    <div class="bonus-grid">
+      <div class="bonus-item">
+        <div class="bonus-item-icon"><i data-lucide="dollar-sign" style="stroke:white;"></i></div>
+        <div class="bonus-item-title">$2,000 Credit</div>
+        <div class="bonus-item-desc">Implementation services</div>
+      </div>
+      <div class="bonus-item">
+        <div class="bonus-item-icon"><i data-lucide="zap" style="stroke:white;"></i></div>
+        <div class="bonus-item-title">Priority Onboarding</div>
+        <div class="bonus-item-desc">Fast-track your deployment</div>
+      </div>
+      <div class="bonus-item">
+        <div class="bonus-item-icon"><i data-lucide="graduation-cap" style="stroke:white;"></i></div>
+        <div class="bonus-item-title">Campus Training</div>
+        <div class="bonus-item-desc">Free admin training sessions</div>
+      </div>
+    </div>
+    <div class="bonus-timer"><span id="bonusTimer" style="font-weight:600;"></span> remaining to claim this offer</div>
+  </div>
+
+  <!-- Limited Spots Warning -->
+  <div class="warning-callout">
+    <i data-lucide="alert-triangle" style="width:24px; height:24px; stroke:#d4a017; flex-shrink:0;"></i>
+    <div class="warning-callout-text">
+      <strong>Limited Implementation Slots:</strong> Only <strong>3 spots remaining</strong> for next semester deployment. Reserve yours by accepting today.
+    </div>
+  </div>
+
+  <div class="proposal-card accept-section" id="acceptSection">
+    <h2>Accept This Proposal</h2>
+    <p>By signing below, you confirm acceptance of the PlaceOS CampusOS proposal as detailed above.</p>
+
+    <!-- Guarantee Badge -->
+    <div class="guarantee-card">
+      <h3>90-Day Satisfaction Guarantee</h3>
+      <p>If PlaceOS doesn't meet your expectations within the first 90 days, we'll refund your annual licence fee — no questions asked. You have nothing to lose.</p>
+      <div class="guarantee-footer">
+        Risk-free commitment &middot; Industry-leading platform &middot; Dedicated support team
+      </div>
+    </div>
+
+    <div class="terms">
+      <strong>Terms & Conditions</strong><br><br>
+      1. <strong>Licence Term:</strong> This proposal covers a 12-month annual software licence commencing from the date of acceptance. The licence auto-renews annually unless either party provides 60 days written notice of non-renewal.<br><br>
+      2. <strong>Pricing:</strong> All pricing is in USD, excludes GST/VAT, and excludes hardware supply or physical setup. Pricing is valid for 30 days from the date of this proposal.<br><br>
+      3. <strong>Payment Terms:</strong> Invoices are due within 30 days of issue. Payment milestones are as outlined above.<br><br>
+      4. <strong>Implementation:</strong> PlaceOS will provide the software platform and standard configuration as described. Implementation and hardware setup are to be completed by the customer or their nominated partner.<br><br>
+      5. <strong>Support:</strong> Standard support is included during business hours (AEST). Priority support packages are available on request.<br><br>
+      6. <strong>Data & Privacy:</strong> All customer data is hosted on dedicated Azure infrastructure and handled in accordance with applicable privacy legislation.<br><br>
+      7. <strong>Intellectual Property:</strong> PlaceOS retains all IP rights in the platform. The customer receives a non-exclusive licence to use the software for the agreed term.<br><br>
+      8. <strong>Satisfaction Guarantee:</strong> If you are not satisfied with the platform within 90 days of go-live, we will refund your annual licence fee (setup fees excluded).
+    </div>
+
+    <div class="sig-area">
+      <label for="sigName">Your Full Name</label>
+      <input type="text" id="sigName" placeholder="Type your full legal name">
+
+      <label>Signature</label>
+      <div class="sig-canvas-wrap">
+        <canvas id="sigCanvas"></canvas>
+        <button type="button" class="sig-clear" id="sigClear">Clear</button>
+      </div>
+      <p class="sig-hint">Draw your signature above using your mouse or finger.</p>
+    </div>
+
+    <button class="accept-btn" id="acceptBtn" disabled>
+      <span id="btnText">Accept & Claim Your Bonuses</span>
+    </button>
+    <p class="accept-note">
+      Secure &middot; Legally binding &middot; Instant processing
+    </p>
+  </div>
+  <% } else { %>
+  <div class="proposal-card" style="text-align:center;">
+    <div class="invoice-stamp">Proposal Accepted</div>
+    <p>Accepted by <strong><%= quote.signature_name %></strong> on <%= new Date(quote.accepted_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) %></p>
+    <br>
+    <%
+      const invoiceUrl = quote.pin_code
+        ? `/${quote.slug}/invoice?pin=${encodeURIComponent(quote.pin_code)}`
+        : `/${quote.slug}/invoice`;
+    %>
+    <a href="<%= invoiceUrl %>" style="display:inline-block; padding:14px 40px; background:#1a3a5c; color:white; border-radius:8px; font-weight:600;">View Invoice</a>
+  </div>
+  <% } %>
+
+</div>
+
+<!-- Success Overlay -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <div class="success-icon"><i data-lucide="check" style="stroke:#1a8a4a; width:32px; height:32px;"></i></div>
+    <h2>Proposal Accepted!</h2>
+    <p>Thank you for accepting the PlaceOS CampusOS proposal. Your invoice has been generated.</p>
+    <%
+      const successInvoiceUrl = quote.pin_code
+        ? `/${quote.slug}/invoice?pin=${encodeURIComponent(quote.pin_code)}`
+        : `/${quote.slug}/invoice`;
+    %>
+    <a href="<%= successInvoiceUrl %>" id="invoiceLink">View Your Invoice</a>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="container">
+    <div class="logo footer-logo">Place<span>OS</span></div>
+    <p>Smart Campus Management Platform</p>
+    <p class="footer-links">
+      <a href="https://place.technology" target="_blank">place.technology</a> &middot;
+      <a href="mailto:sales@place.technology">sales@place.technology</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+(function() {
+  <% if (quote.status === 'pending') { %>
+
+  // Countdown Timer
+  const createdDate = new Date('<%= quote.created_at %>');
+  const earlyBirdDate = new Date(createdDate.getTime() + 3 * 24 * 60 * 60 * 1000);
+
+  function updateCountdown() {
+    const now = new Date();
+    const timeLeft = earlyBirdDate - now;
+
+    if (timeLeft <= 0) {
+      document.getElementById('countdown').innerHTML = '<span style="opacity:0.6;">Bonus expired</span>';
+      document.getElementById('bonusTimer').textContent = 'Expired';
+      const banner = document.getElementById('offerBanner');
+      if (banner) banner.style.display = 'none';
+      return;
+    }
+
+    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+    const u = (val, label) => `<div class="countdown-unit"><div class="countdown-val">${val}</div><div class="countdown-label">${label}</div></div>`;
+    document.getElementById('countdown').innerHTML = u(days,'days') + u(hours,'hrs') + u(minutes,'min') + u(seconds,'sec');
+    document.getElementById('bonusTimer').textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+  }
+
+  updateCountdown();
+  setInterval(updateCountdown, 1000);
+
+  // Signature pad
+  const canvas = document.getElementById('sigCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false;
+  let hasSig = false;
+
+  function resizeCanvas() {
+    const rect = canvas.parentElement.getBoundingClientRect();
+    canvas.width = rect.width - 16;
+    canvas.height = 150;
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches ? e.touches[0] : e;
+    return { x: touch.clientX - rect.left, y: touch.clientY - rect.top };
+  }
+
+  canvas.addEventListener('mousedown', e => { drawing = true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); });
+  canvas.addEventListener('mousemove', e => { if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasSig = true; checkAcceptReady(); });
+  canvas.addEventListener('mouseup', () => drawing = false);
+  canvas.addEventListener('mouseleave', () => drawing = false);
+  canvas.addEventListener('touchstart', e => { e.preventDefault(); drawing = true; ctx.beginPath(); ctx.moveTo(getPos(e).x, getPos(e).y); });
+  canvas.addEventListener('touchmove', e => { e.preventDefault(); if (!drawing) return; const p = getPos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); hasSig = true; checkAcceptReady(); });
+  canvas.addEventListener('touchend', () => drawing = false);
+
+  document.getElementById('sigClear').addEventListener('click', () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    hasSig = false;
+    checkAcceptReady();
+  });
+
+  const nameInput = document.getElementById('sigName');
+  nameInput.addEventListener('input', checkAcceptReady);
+
+  function checkAcceptReady() {
+    document.getElementById('acceptBtn').disabled = !(nameInput.value.trim() && hasSig);
+  }
+
+  document.getElementById('acceptBtn').addEventListener('click', async () => {
+    const btn = document.getElementById('acceptBtn');
+    const btnText = document.getElementById('btnText');
+    btn.disabled = true;
+    btnText.textContent = 'Processing...';
+
+    const body = {
+      signature_name: nameInput.value.trim(),
+      signature_data: canvas.toDataURL('image/png'),
+    };
+
+    try {
+      const res = await fetch('/<%= quote.slug %>/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const json = await res.json();
+      if (json.success) {
+        document.getElementById('successOverlay').classList.add('show');
+      } else {
+        alert(json.error || 'Error accepting proposal.');
+        btn.disabled = false;
+        btnText.textContent = 'Accept & Claim Your Bonuses';
+      }
+    } catch (err) {
+      alert('Network error. Please try again.');
+      btn.disabled = false;
+      btnText.textContent = 'Accept & Claim Your Bonuses';
+    }
+  });
+})();
+<% } %>
+</script>
+<script>lucide.createIcons();</script>
+</body>
+</html>

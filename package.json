@@ -1,0 +1,21 @@
+{
+  "name": "placeos-universityquote",
+  "version": "1.0.0",
+  "description": "PlaceOS CampusOS — Self-service quote and proposal platform for universities",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "dotenv": "^17.3.1",
+    "ejs": "^5.0.1",
+    "express": "^5.2.1",
+    "node-cron": "^4.2.1",
+    "nodemailer": "^8.0.2",
+    "resend": "^6.9.4",
+    "serverless-http": "^3.2.0",
+    "xero-node": "^14.0.0"
+  }
+}

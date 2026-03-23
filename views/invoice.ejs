@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Invoice <%= quote.invoice_number %> — PlaceOS CampusOS</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/lucide@0.309.0/dist/umd/lucide.min.js"></script>
+</head>
+<body style="background:#f5f6f8;">
+
+<div class="invoice-page">
+  <div class="invoice-header">
+    <div>
+      <div class="logo" style="font-size:1.8em; margin-bottom:8px;">Place<span>OS</span></div>
+      <h1>Tax Invoice</h1>
+    </div>
+    <div class="invoice-meta">
+      <p><strong>Invoice #:</strong> <%= quote.invoice_number %></p>
+      <p><strong>Date:</strong> <%= new Date(quote.accepted_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) %></p>
+      <p><strong>Due:</strong> <%= new Date(new Date(quote.accepted_at).getTime() + 30*24*60*60*1000).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) %></p>
+      <p><strong>Status:</strong> <span style="background:rgba(255,255,255,0.15); padding:2px 10px; border-radius:10px;">Due</span></p>
+    </div>
+  </div>
+
+  <div class="invoice-body">
+
+    <div class="invoice-parties">
+      <div>
+        <h3>From</h3>
+        <% if (typeof orgDetails !== 'undefined' && orgDetails) { %>
+          <p><strong><%= orgDetails.legalName || orgDetails.name %></strong></p>
+          <% if (orgDetails.taxNumber) { %><p>ABN: <%= orgDetails.taxNumber %></p><% } %>
+          <% if (orgDetails.addresses && orgDetails.addresses.length > 0) { const addr = orgDetails.addresses[0]; %>
+            <% if (addr.addressLine1) { %><p><%= addr.addressLine1 %></p><% } %>
+            <% if (addr.city || addr.region || addr.postalCode) { %><p><%= [addr.city, addr.region, addr.postalCode, addr.country].filter(Boolean).join(', ') %></p><% } %>
+          <% } %>
+        <% } else { %>
+          <p><strong><%= process.env.COMPANY_NAME || 'Place Technology Pty Ltd' %></strong></p>
+          <p>accounts@place.technology</p>
+        <% } %>
+      </div>
+      <div>
+        <h3>Bill To</h3>
+        <p><strong><%= quote.company_name %></strong></p>
+        <p><%= quote.contact_name %></p>
+        <p><%= quote.contact_email %></p>
+      </div>
+    </div>
+
+    <h3 style="font-size:1.1em; color:#1a3a5c; margin-bottom:12px;">Milestone 1 — Contract Signing</h3>
+    <p style="font-size:0.9em; color:#888; margin-bottom:16px;">Annual licence (upfront) + 50% of setup services as per accepted proposal.</p>
+
+    <table class="invoice-table">
+      <thead>
+        <tr><th>Description</th><th>Qty</th><th>Unit Price</th><th>Amount (USD)</th></tr>
+      </thead>
+      <tbody>
+        <% if (quote.num_bookable_spaces > 0) { %>
+        <tr><td>Bookable Spaces — Annual Licence</td><td><%= quote.num_bookable_spaces %></td><td>$<%= PRICING.bookable_spaces.usd %></td><td>$<%= (quote.num_bookable_spaces * PRICING.bookable_spaces.usd).toLocaleString() %></td></tr>
+        <% } %>
+        <% if (quote.num_floors > 0) { %>
+        <tr><td>Environmental Monitoring — Annual Licence</td><td><%= quote.num_floors %></td><td>$<%= PRICING.env_monitoring.usd.toLocaleString() %></td><td>$<%= (quote.num_floors * PRICING.env_monitoring.usd).toLocaleString() %></td></tr>
+        <tr><td>Space Utilisation — Annual Licence</td><td><%= quote.num_floors %></td><td>$<%= PRICING.space_util.usd.toLocaleString() %></td><td>$<%= (quote.num_floors * PRICING.space_util.usd).toLocaleString() %></td></tr>
+        <% } %>
+        <% if (quote.num_parking_spaces > 0) { %>
+        <tr><td>Campus Parking — Annual Licence</td><td><%= quote.num_parking_spaces %></td><td>$<%= PRICING.campus_parking.usd %></td><td>$<%= (quote.num_parking_spaces * PRICING.campus_parking.usd).toLocaleString() %></td></tr>
+        <% } %>
+        <% if (quote.num_av_rooms > 0) { %>
+        <tr><td>AV Control — Annual Licence</td><td><%= quote.num_av_rooms %></td><td>$<%= PRICING.av_control.usd %></td><td>$<%= (quote.num_av_rooms * PRICING.av_control.usd).toLocaleString() %></td></tr>
+        <% } %>
+        <% if (quote.include_digital_signage) { %>
+        <tr><td>Digital Signage — Annual Licence</td><td><%= quote.num_buildings %></td><td>$<%= PRICING.digital_signage.usd.toLocaleString() %></td><td>$<%= (quote.num_buildings * PRICING.digital_signage.usd).toLocaleString() %></td></tr>
+        <% } %>
+        <% if (quote.include_visitor_mgmt) { %>
+        <tr><td>Visitor Management — Annual Licence</td><td><%= quote.num_buildings %></td><td>$<%= PRICING.visitor_mgmt.usd.toLocaleString() %></td><td>$<%= (quote.num_buildings * PRICING.visitor_mgmt.usd).toLocaleString() %></td></tr>
+        <% } %>
+
+        <% if (quote.discount_pct > 0) { %>
+        <tr><td colspan="3"><em>Volume Discount (<%= (quote.discount_pct * 100) %>%)</em></td><td style="color:#1a8a4a;">&#8722;$<%= quote.discount_amount.toLocaleString() %></td></tr>
+        <% } %>
+
+        <!-- Setup Services (50%) -->
+        <tr><td>Platform Configuration (50%)</td><td>1</td><td>$<%= quote.setup_config.toLocaleString() %></td><td>$<%= (quote.setup_config * 0.5).toLocaleString() %></td></tr>
+        <tr><td>Map Creation — <%= quote.num_floors %> floor(s) (50%)</td><td><%= quote.num_floors %></td><td>$1,000</td><td>$<%= (quote.setup_maps * 0.5).toLocaleString() %></td></tr>
+        <tr><td>Integration & Onboarding (50%)</td><td>1</td><td>$<%= quote.setup_integration.toLocaleString() %></td><td>$<%= (quote.setup_integration * 0.5).toLocaleString() %></td></tr>
+
+        <% if (quote.early_bird_bonus) { %>
+        <tr style="background:#eef7f0;">
+          <td colspan="3">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span class="bonus-badge-inline">BONUS</span>
+              Early Bird Implementation Credit — Accepted within 72 hours
+            </div>
+          </td>
+          <td style="color:#1a8a4a; font-weight:600;">&#8722;$2,000</td>
+        </tr>
+        <% } %>
+
+        <tr class="inv-total">
+          <td colspan="3"><strong>Total Due — Milestone 1</strong></td>
+          <td><strong>$<%= (quote.total_annual + quote.setup_total * 0.5 - (quote.early_bird_bonus ? 2000 : 0)).toLocaleString() %> USD</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="invoice-footer">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:40px;">
+        <div>
+          <h3 style="font-size:0.82em; text-transform:uppercase; color:#999; letter-spacing:1px; margin-bottom:8px;">Payment Details</h3>
+          <% if (typeof bankDetails !== 'undefined' && bankDetails) { %>
+            <p style="font-size:0.9em;"><strong>Account Name:</strong> <%= bankDetails.name %></p>
+            <p style="font-size:0.9em;"><strong>Account #:</strong> <%= bankDetails.bankAccountNumber %></p>
+            <p style="font-size:0.9em;"><strong>Currency:</strong> <%= bankDetails.currencyCode %></p>
+          <% } else { %>
+            <p style="font-size:0.9em;">Contact <a href="mailto:accounts@place.technology">accounts@place.technology</a> for payment details.</p>
+          <% } %>
+          <p style="font-size:0.9em; margin-top:8px;">Reference: <strong><%= quote.invoice_number %></strong></p>
+        </div>
+        <div>
+          <h3 style="font-size:0.82em; text-transform:uppercase; color:#999; letter-spacing:1px; margin-bottom:8px;">Authorised Signature</h3>
+          <p style="font-size:0.9em;"><strong><%= quote.signature_name %></strong></p>
+          <% if (quote.signature_data) { %>
+          <img src="<%= quote.signature_data %>" class="sig-display" alt="Signature" style="max-width:200px; margin:8px 0;">
+          <% } %>
+          <p style="font-size:0.82em; color:#999;">Signed: <%= new Date(quote.accepted_at).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }) %></p>
+          <p style="font-size:0.82em; color:#999;">IP: <%= quote.ip_address %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="invoice-stamp">Accepted & Invoiced</div>
+  </div>
+
+  <!-- Next Steps Section -->
+  <div class="next-steps-card">
+    <h2>Welcome to PlaceOS CampusOS</h2>
+    <p>Your campus deployment journey starts here. Let's get you up and running.</p>
+    <div class="next-steps-grid">
+      <a href="https://docs.placeos.com" target="_blank" class="next-step-item">
+        <div class="next-step-icon"><i data-lucide="book-open" style="stroke:white;"></i></div>
+        <div class="next-step-title">Technical Documentation</div>
+        <div class="next-step-desc">Review system requirements & integration guides</div>
+      </a>
+      <a href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ1234567890" target="_blank" class="next-step-item">
+        <div class="next-step-icon"><i data-lucide="calendar" style="stroke:white;"></i></div>
+        <div class="next-step-title">Book Kickoff Meeting</div>
+        <div class="next-step-desc">Schedule with our deployment team</div>
+      </a>
+    </div>
+    <p style="margin:24px 0 0 0; font-size:0.9em; opacity:0.6;">Questions? Contact <a href="mailto:support@place.technology" style="color:white; text-decoration:underline;">support@place.technology</a></p>
+  </div>
+
+  <!-- Optional Extras Section -->
+  <div class="extras-card">
+    <h2>Optional Extras</h2>
+    <p class="extras-sub">Enhance your PlaceOS CampusOS deployment with these premium add-ons</p>
+
+    <div class="extra-item">
+      <div class="extra-icon"><i data-lucide="sparkles"></i></div>
+      <div style="flex:1;">
+        <h3>AI Integration & Automation</h3>
+        <p>Intelligent campus assistant powered by AI. Natural language booking, predictive space allocation, automated scheduling, and smart recommendations for students and staff.</p>
+        <div class="extra-pricing">
+          <div style="font-size:0.85em; color:#666; margin-bottom:4px;">Pricing:</div>
+          <div style="font-size:1.1em; font-weight:600; color:#1a3a5c;">$30,000 USD <span style="font-size:0.85em; font-weight:normal; color:#666;">fixed setup fee</span></div>
+          <div style="font-size:0.85em; color:#666; margin-top:4px;">+ API usage costs (typically $200-500/month)</div>
+        </div>
+        <a href="mailto:sales@place.technology?subject=AI Integration for <%= quote.company_name %>&body=Hi, I'm interested in adding AI Integration to invoice <%= quote.invoice_number %>." class="extra-cta">Request AI Integration</a>
+      </div>
+    </div>
+
+    <p style="margin:24px 0 0 0; text-align:center; font-size:0.85em; color:#999;">These extras can be added at any time. Contact our sales team for custom packages.</p>
+  </div>
+
+  <button class="print-btn" onclick="window.print()">Print / Download PDF</button>
+</div>
+
+<div style="text-align:center; padding:24px;">
+  <%
+    const proposalUrl = quote.pin_code
+      ? `/${quote.slug}?pin=${encodeURIComponent(quote.pin_code)}`
+      : `/${quote.slug}`;
+  %>
+  <a href="<%= proposalUrl %>" style="color:#4a90d9; font-size:0.9em;">Back to Proposal</a>
+</div>
+
+<script>lucide.createIcons();</script>
+</body>
+</html>

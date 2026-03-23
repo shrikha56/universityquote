@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlaceOS CampusOS — Build Your Quote</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <script src="https://unpkg.com/lucide@0.309.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-content">
+    <div class="logo">Place<span>OS</span></div>
+    <h1>CampusOS</h1>
+    <p class="tagline">Smart Campus Management Platform</p>
+    <p class="hero-sub">Configure your campus, get an instant quote, and activate in minutes.</p>
+    <a href="#configurator" class="hero-btn">Build Your Quote</a>
+  </div>
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,40 C360,120 1080,0 1440,80 L1440,120 L0,120 Z" fill="#f5f6f8"/></svg>
+  </div>
+</header>
+
+<!-- Value Props -->
+<section class="value-props">
+  <div class="container">
+    <div class="props-grid">
+      <div class="prop-card">
+        <div class="prop-icon"><i data-lucide="calendar-range"></i></div>
+        <h3>Bookable Spaces</h3>
+        <p>Intelligent scheduling for lecture halls, seminar rooms, labs, study areas, and collaborative zones with real-time availability.</p>
+      </div>
+      <div class="prop-card">
+        <div class="prop-icon"><i data-lucide="car"></i></div>
+        <h3>Campus Parking</h3>
+        <p>Automated parking allocation for staff and students — reserve spots via mobile before arriving on campus.</p>
+      </div>
+      <div class="prop-card">
+        <div class="prop-icon"><i data-lucide="user-check"></i></div>
+        <h3>Visitor Management</h3>
+        <p>Guest check-in, event registration, campus tours, host notifications, and compliance tracking for every visitor.</p>
+      </div>
+      <div class="prop-card">
+        <div class="prop-icon"><i data-lucide="bar-chart-3"></i></div>
+        <h3>Space Utilisation</h3>
+        <p>Real-time occupancy analytics and heatmaps — understand how your campus spaces are actually used.</p>
+      </div>
+      <div class="prop-card">
+        <div class="prop-icon"><i data-lucide="thermometer"></i></div>
+        <h3>Environmental Monitoring</h3>
+        <p>Track temperature, humidity, CO2, and air quality across campus for optimal comfort and compliance.</p>
+      </div>
+      <div class="prop-card">
+        <div class="prop-icon"><i data-lucide="monitor"></i></div>
+        <h3>Digital Signage</h3>
+        <p>Campus wayfinding, room schedules, event announcements, and real-time information displays across buildings.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Configurator -->
+<section id="configurator" class="configurator-section">
+  <div class="container">
+    <h2>Configure Your Campus</h2>
+    <p class="section-sub">Enter your details and campus setup below to receive an instant quote.</p>
+
+    <form id="quoteForm" class="quote-form">
+      <!-- Contact Details -->
+      <div class="form-block">
+        <h3>Your Details</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="contact_name">Full Name <span class="req">*</span></label>
+            <input type="text" id="contact_name" name="contact_name" required placeholder="Jane Smith">
+          </div>
+          <div class="form-group">
+            <label for="contact_email">Email <span class="req">*</span></label>
+            <input type="email" id="contact_email" name="contact_email" required placeholder="jane@university.edu">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="company_name">Company / University Name <span class="req">*</span></label>
+            <input type="text" id="company_name" name="company_name" required placeholder="University of Sydney">
+          </div>
+          <div class="form-group">
+            <label for="num_buildings">Number of Buildings</label>
+            <input type="number" id="num_buildings" name="num_buildings" min="1" value="1" class="qty-input">
+          </div>
+        </div>
+      </div>
+
+      <!-- Campus Setup -->
+      <div class="form-block">
+        <h3>Campus Setup</h3>
+        <p class="form-hint">Enter the quantities for each asset type on your campus. Pricing is calculated as annual USD per unit.</p>
+
+        <div class="asset-grid">
+
+          <div class="asset-card">
+            <div class="asset-icon"><i data-lucide="calendar-range"></i></div>
+            <div class="asset-info">
+              <h4>Bookable Spaces</h4>
+              <p class="asset-price">$<%= PRICING.bookable_spaces.usd %>/space/year</p>
+              <p class="asset-includes">Any bookable room, desk, lab, or study area — lecture halls, seminar rooms, libraries, collaborative zones, and shared research labs.</p>
+            </div>
+            <div class="asset-input">
+              <button type="button" class="qty-btn minus" data-target="num_bookable_spaces">&#8722;</button>
+              <input type="number" id="num_bookable_spaces" name="num_bookable_spaces" min="0" value="0" class="qty-input">
+              <button type="button" class="qty-btn plus" data-target="num_bookable_spaces">+</button>
+            </div>
+            <div class="asset-subtotal" data-for="bookable_spaces">$0</div>
+          </div>
+
+          <div class="asset-card">
+            <div class="asset-icon"><i data-lucide="layers"></i></div>
+            <div class="asset-info">
+              <h4>Floors</h4>
+              <p class="asset-price">$<%= PRICING.env_monitoring.usd + PRICING.space_util.usd %>/floor/year</p>
+              <p class="asset-includes">Environmental monitoring + space utilisation per floor</p>
+            </div>
+            <div class="asset-input">
+              <button type="button" class="qty-btn minus" data-target="num_floors">&#8722;</button>
+              <input type="number" id="num_floors" name="num_floors" min="0" value="0" class="qty-input">
+              <button type="button" class="qty-btn plus" data-target="num_floors">+</button>
+            </div>
+            <div class="asset-subtotal" data-for="floors">$0</div>
+          </div>
+
+          <div class="asset-card">
+            <div class="asset-icon"><i data-lucide="car"></i></div>
+            <div class="asset-info">
+              <h4>Campus Parking</h4>
+              <p class="asset-price">$<%= PRICING.campus_parking.usd %>/space/year</p>
+              <p class="asset-includes">Automated parking allocation for staff and students — reserve spots via mobile before arriving on campus.</p>
+            </div>
+            <div class="asset-input">
+              <button type="button" class="qty-btn minus" data-target="num_parking_spaces">&#8722;</button>
+              <input type="number" id="num_parking_spaces" name="num_parking_spaces" min="0" value="0" class="qty-input">
+              <button type="button" class="qty-btn plus" data-target="num_parking_spaces">+</button>
+            </div>
+            <div class="asset-subtotal" data-for="parking_spaces">$0</div>
+          </div>
+
+          <div class="asset-card">
+            <div class="asset-icon"><i data-lucide="speaker"></i></div>
+            <div class="asset-info">
+              <h4>AV Control</h4>
+              <p class="asset-price">$<%= PRICING.av_control.usd %>/room/year</p>
+              <p class="asset-includes">Automated AV management for lecture theatres — projectors, screens, microphones, and recording systems.</p>
+            </div>
+            <div class="asset-input">
+              <button type="button" class="qty-btn minus" data-target="num_av_rooms">&#8722;</button>
+              <input type="number" id="num_av_rooms" name="num_av_rooms" min="0" value="0" class="qty-input">
+              <button type="button" class="qty-btn plus" data-target="num_av_rooms">+</button>
+            </div>
+            <div class="asset-subtotal" data-for="av_rooms">$0</div>
+          </div>
+
+          <div class="asset-card optional-feature">
+            <div class="asset-icon"><i data-lucide="monitor"></i></div>
+            <div class="asset-info">
+              <h4>Digital Signage <span class="badge badge-optional">OPTIONAL</span></h4>
+              <p class="asset-price">$<%= PRICING.digital_signage.usd.toLocaleString() %>/building/year</p>
+              <p class="asset-includes">Campus wayfinding, room schedules, event announcements, and real-time information displays.</p>
+            </div>
+            <div class="asset-input">
+              <label class="checkbox-wrapper">
+                <input type="checkbox" id="include_digital_signage" name="include_digital_signage" value="1">
+                <span class="checkbox-label">Include Digital Signage</span>
+              </label>
+            </div>
+            <div class="asset-subtotal" data-for="digital_signage">$0</div>
+          </div>
+
+          <div class="asset-card optional-feature">
+            <div class="asset-icon"><i data-lucide="user-check"></i></div>
+            <div class="asset-info">
+              <h4>Visitor Management <span class="badge badge-optional">OPTIONAL</span></h4>
+              <p class="asset-price">$<%= PRICING.visitor_mgmt.usd.toLocaleString() %>/building/year</p>
+              <p class="asset-includes">Guest check-in, event registration, campus tours, host notifications, and compliance tracking.</p>
+            </div>
+            <div class="asset-input">
+              <label class="checkbox-wrapper">
+                <input type="checkbox" id="include_visitor_mgmt" name="include_visitor_mgmt" value="1">
+                <span class="checkbox-label">Include Visitor Management</span>
+              </label>
+            </div>
+            <div class="asset-subtotal" data-for="visitor_mgmt">$0</div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Security PIN -->
+      <div class="form-block">
+        <h3>Secure Your Proposal <span style="font-size:0.75em; font-weight:normal; color:#999;">(Optional)</span></h3>
+        <p class="form-hint">Set a 4-digit PIN to protect your proposal from unauthorized access.</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="pin_code">4-Digit PIN Code <span style="font-size:0.85em; font-weight:normal; color:#999;">(optional)</span></label>
+            <input type="password" id="pin_code" name="pin_code" maxlength="4" pattern="[0-9]{4}" placeholder="e.g., 1234" style="max-width:200px;">
+            <p style="font-size:0.8em; color:#666; margin-top:6px;">Remember this PIN — you'll need it to view your proposal</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Price Summary -->
+      <div class="price-summary" id="priceSummary">
+        <h3>Your Quote Summary</h3>
+        <div class="summary-grid">
+          <div class="summary-lines" id="summaryLines">
+            <div class="summary-empty">Add items above to see your quote</div>
+          </div>
+          <div class="summary-totals">
+            <div class="total-line"><span>Annual Licence Subtotal</span><span id="sumSubtotal">$0</span></div>
+            <div class="total-line discount" id="discountLine" style="display:none"><span>Volume Discount (<span id="discountPct">0</span>%)</span><span id="sumDiscount">&#8722;$0</span></div>
+            <div class="total-line grand"><span>Total Annual Licence (USD)</span><span id="sumTotal">$0</span></div>
+            <div class="total-divider"></div>
+            <div class="total-line"><span>One-Time Setup Fee</span><span id="sumSetup">$11,000</span></div>
+            <div class="total-line setup-detail"><span>   Platform configuration</span><span>$6,000</span></div>
+            <div class="total-line setup-detail" id="setupMapsLine"><span>   Map creation (<span id="mapCount">0</span> floors)</span><span id="sumMaps">$0</span></div>
+            <div class="total-line setup-detail"><span>   Integration & onboarding</span><span>$5,000</span></div>
+          </div>
+        </div>
+        <button type="submit" class="generate-btn" id="generateBtn" disabled>
+          <span class="btn-text">Generate My Proposal</span>
+          <span class="btn-loading" style="display:none">Generating...</span>
+        </button>
+        <p class="form-note">Your proposal will be available at a unique URL you can share with stakeholders.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="logo footer-logo">Place<span>OS</span></div>
+    <p>Smart Campus Management Platform</p>
+    <p class="footer-links">
+      <a href="https://place.technology" target="_blank">place.technology</a> &middot;
+      <a href="mailto:sales@place.technology">sales@place.technology</a>
+    </p>
+    <p class="copyright">All pricing is in USD, excludes GST. Pricing excludes hardware supply or setup.</p>
+  </div>
+</footer>
+
+<script src="/js/configurator.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
