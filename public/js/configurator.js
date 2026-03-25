@@ -159,6 +159,10 @@
     const body = {};
     data.forEach((v, k) => body[k] = v);
 
+    // Include Turnstile token
+    const turnstileInput = form.querySelector('[name="cf-turnstile-response"]');
+    if (turnstileInput) body['cf-turnstile-response'] = turnstileInput.value;
+
     try {
       const res = await fetch('/generate-quote', {
         method: 'POST',
@@ -177,6 +181,7 @@
       btn.querySelector('.btn-text').style.display = 'inline';
       btn.querySelector('.btn-loading').style.display = 'none';
       btn.disabled = false;
+      if (window.turnstile) turnstile.reset();
     }
   });
 

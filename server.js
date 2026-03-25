@@ -295,7 +295,31 @@ app.get('/', (req, res) => {
 });
 
 // Generate quote
-app.post('/generate-quote', (req, res) => {
+app.post('/generate-quote', async (req, res) => {
+  // Verify Cloudflare Turnstile
+  const turnstileToken = req.body['cf-turnstile-response'];
+  if (!turnstileToken) {
+    return res.status(400).json({ error: 'Please complete the human verification.' });
+  }
+  try {
+    const turnstileRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        secret: process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAACvmCvz5iC3Ar48jKQV6tNOW6AE',
+        response: turnstileToken,
+        remoteip: req.ip,
+      }),
+    });
+    const turnstileData = await turnstileRes.json();
+    if (!turnstileData.success) {
+      return res.status(403).json({ error: 'Human verification failed. Please try again.' });
+    }
+  } catch (err) {
+    console.error('Turnstile verification error:', err.message);
+    return res.status(500).json({ error: 'Verification service unavailable. Please try again.' });
+  }
+
   const { contact_name, contact_email, company_name, pin_code,
     num_bookable_spaces, num_parking_spaces, num_av_rooms,
     num_floors, num_buildings, include_digital_signage, include_visitor_mgmt } = req.body;
