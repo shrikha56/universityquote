@@ -518,7 +518,7 @@ app.post('/:slug/accept', async (req, res) => {
       console.log(`Created Xero quote (late): ${xeroQuoteId}`);
     }
 
-    const invoices = await convertQuoteToInvoice(xeroQuoteId, invoice_number, quote);
+    const invoices = await convertQuoteToInvoice(xeroQuoteId, invoice_number, { ...quote, early_bird_bonus: earlyBirdBonus });
     xeroInvoiceId = invoices.depositInvoiceId;
     xeroFinalInvoiceId = invoices.finalInvoiceId;
 

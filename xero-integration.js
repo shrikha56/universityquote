@@ -370,6 +370,17 @@ async function convertQuoteToInvoice(xeroQuoteId, invoiceNumber, quote) {
     m1LineItems.push(mapItem(li));
   }
 
+  // Add early bird bonus if accepted within 72 hours (not in Xero quote since it's determined at acceptance)
+  if (quote && quote.early_bird_bonus) {
+    m1LineItems.push({
+      description: 'Early Bird Bonus — $2,000 Implementation Credit (accepted within 72 hrs)',
+      quantity: 1,
+      unitAmount: -2000,
+      accountCode: '200',
+      taxType: 'OUTPUT',
+    });
+  }
+
   for (const li of setupItems) {
     m1LineItems.push({
       description: `${li.description} (50% deposit)`,
