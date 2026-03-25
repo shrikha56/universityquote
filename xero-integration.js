@@ -251,12 +251,12 @@ function buildLineItems(quote) {
     });
   }
 
-  // Early bird bonus (free setup waiver)
+  // Early bird bonus ($2,000 implementation credit)
   if (quote.early_bird_bonus) {
     lineItems.push({
-      description: 'Early Bird Bonus - Setup fee waived (accepted within 72 hrs)',
+      description: 'Early Bird Bonus — $2,000 Implementation Credit (accepted within 72 hrs)',
       quantity: 1,
-      unitAmount: 0,
+      unitAmount: -2000,
       accountCode: '200',
       taxType: 'OUTPUT',
     });
