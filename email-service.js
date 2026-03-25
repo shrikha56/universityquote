@@ -182,10 +182,8 @@ async function sendDownsellEmail(quote, discountPct) {
 }
 
 // Send acceptance confirmation email with Xero invoice PDF attached
-async function sendAcceptanceEmail(quote, pdfBuffer) {
-  const invoiceUrl = quote.pin_code
-    ? `${process.env.BASE_URL}/${quote.slug}/invoice?pin=${encodeURIComponent(quote.pin_code)}`
-    : `${process.env.BASE_URL}/${quote.slug}/invoice`;
+async function sendAcceptanceEmail(quote, pdfBuffer, xeroPaymentUrl) {
+  const proposalUrl = `${process.env.BASE_URL}/${quote.slug}`;
 
   const attachments = [];
   if (pdfBuffer) {
@@ -220,7 +218,8 @@ async function sendAcceptanceEmail(quote, pdfBuffer) {
               <p style="margin: 4px 0; font-size: 0.9em; color: #555;">3. Book your kickoff meeting with our deployment team</p>
             </div>
             <div style="text-align: center; margin: 32px 0;">
-              <a href="${invoiceUrl}" style="display: inline-block; background: #1a3a5c; color: white; padding: 16px 40px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 1.1em;">View Invoice Online</a>
+              <a href="${proposalUrl}" style="display: inline-block; background: #1a3a5c; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 1em; margin-right: 12px;">View Proposal Online</a>
+              ${xeroPaymentUrl ? `<a href="${xeroPaymentUrl}" style="display: inline-block; background: #1a8a4a; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 1em;">Make Payment</a>` : ''}
             </div>
             <p style="color: #555;">Questions? Contact <a href="mailto:accounts@place.technology" style="color: #4a90d9;">accounts@place.technology</a></p>
             <p style="margin-top: 32px; color: #555;">Welcome aboard,<br><strong>PlaceOS Team</strong></p>

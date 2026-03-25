@@ -530,6 +530,19 @@ async function getBankAccount() {
   }
 }
 
+async function getOnlineInvoiceUrl(xeroInvoiceId) {
+  try {
+    await ensureToken();
+    const tenantId = getTenantId();
+    const response = await xero.accountingApi.getOnlineInvoice(tenantId, xeroInvoiceId);
+    const url = response.body.onlineInvoices?.[0]?.onlineInvoiceUrl;
+    return url || null;
+  } catch (err) {
+    console.error('Failed to get Xero online invoice URL:', err.message);
+    return null;
+  }
+}
+
 module.exports = {
   xero,
   initializeXero,
@@ -541,4 +554,5 @@ module.exports = {
   getOrganisationDetails,
   getBankAccount,
   getInvoicePdf,
+  getOnlineInvoiceUrl,
 };

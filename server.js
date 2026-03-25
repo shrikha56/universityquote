@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 const Database = require('better-sqlite3');
 const fs = require('fs');
-const { xero, initializeXero, saveTokens, createXeroQuote, convertQuoteToInvoice, emailInvoice, getOrganisationDetails, getBankAccount, getInvoicePdf } = require('./xero-integration');
+const { xero, initializeXero, saveTokens, createXeroQuote, convertQuoteToInvoice, emailInvoice, getOrganisationDetails, getBankAccount, getInvoicePdf, getOnlineInvoiceUrl } = require('./xero-integration');
 const { sendQuoteEmail, sendFollowUpEmail, sendDownsellEmail, testEmailConfig } = require('./email-service');
 
 const app = express();
@@ -234,6 +234,21 @@ app.post('/admin/api/quotes/:slug/mark-paid', (req, res) => {
   if (!quote) return res.status(404).json({ error: 'Quote not found' });
   db.prepare("UPDATE quotes SET status = 'paid' WHERE slug = ?").run(req.params.slug);
   res.json({ success: true });
+});
+
+// Admin API - send M2 invoice
+app.post('/admin/api/quotes/:slug/send-m2', async (req, res) => {
+  const quote = db.prepare('SELECT * FROM quotes WHERE slug = ?').get(req.params.slug);
+  if (!quote) return res.status(404).json({ error: 'Quote not found' });
+  if (!quote.xero_final_invoice_id) return res.status(400).json({ error: 'No M2 invoice found' });
+
+  try {
+    await emailInvoice(quote.xero_final_invoice_id, quote.contact_email);
+    res.json({ success: true, message: 'M2 invoice sent' });
+  } catch (err) {
+    console.error('Failed to send M2 invoice:', err.message);
+    res.status(500).json({ error: 'Failed to send M2 invoice' });
+  }
 });
 
 // Admin dashboard - track pending/abandoned quotes
@@ -511,10 +526,11 @@ app.post('/:slug/accept', async (req, res) => {
     console.log(`Deposit invoice emailed to ${quote.contact_email}`);
 
     const pdfBuffer = await getInvoicePdf(xeroInvoiceId);
+    const xeroPaymentUrl = await getOnlineInvoiceUrl(xeroInvoiceId);
     if (pdfBuffer) {
       const { sendAcceptanceEmail } = require('./email-service');
       const updatedQuote = { ...quote, invoice_number: `${invoice_number}-M1`, early_bird_bonus: earlyBirdBonus };
-      sendAcceptanceEmail(updatedQuote, pdfBuffer).catch(err => console.error('Acceptance email failed:', err.message));
+      sendAcceptanceEmail(updatedQuote, pdfBuffer, xeroPaymentUrl).catch(err => console.error('Acceptance email failed:', err.message));
     }
 
   } catch (err) {
