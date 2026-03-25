@@ -97,9 +97,22 @@
         </tr>
         <% } %>
 
+        <%
+          const subtotalM1 = quote.total_annual + quote.setup_total * 0.5 - (quote.early_bird_bonus ? 2000 : 0);
+          const gstM1 = subtotalM1 * 0.10;
+          const totalIncGstM1 = subtotalM1 + gstM1;
+        %>
+        <tr class="inv-subtotal">
+          <td colspan="3">Subtotal</td>
+          <td>$<%= subtotalM1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></td>
+        </tr>
+        <tr class="inv-gst">
+          <td colspan="3">GST (10%)</td>
+          <td>$<%= gstM1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %></td>
+        </tr>
         <tr class="inv-total">
-          <td colspan="3"><strong>Total Due — Milestone 1</strong></td>
-          <td><strong>$<%= (quote.total_annual + quote.setup_total * 0.5 - (quote.early_bird_bonus ? 2000 : 0)).toLocaleString() %> USD</strong></td>
+          <td colspan="3"><strong>Total Due — Milestone 1 (inc. GST)</strong></td>
+          <td><strong>$<%= totalIncGstM1.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) %> USD</strong></td>
         </tr>
       </tbody>
     </table>
