@@ -243,11 +243,20 @@ app.post('/admin/api/quotes/:slug/send-m2', async (req, res) => {
   if (!quote.xero_final_invoice_id) return res.status(400).json({ error: 'No M2 invoice found' });
 
   try {
+    // Authorise the M2 invoice first (it's created as DRAFT)
+    const tenantId = xero.tenants?.[0]?.tenantId;
+    if (tenantId) {
+      await xero.accountingApi.updateInvoice(tenantId, quote.xero_final_invoice_id, {
+        invoices: [{ invoiceID: quote.xero_final_invoice_id, status: 'AUTHORISED' }],
+      });
+      console.log(`M2 invoice ${quote.xero_final_invoice_id} authorised`);
+    }
+
     await emailInvoice(quote.xero_final_invoice_id, quote.contact_email);
-    res.json({ success: true, message: 'M2 invoice sent' });
+    res.json({ success: true, message: 'M2 invoice authorised and sent' });
   } catch (err) {
     console.error('Failed to send M2 invoice:', err.message);
-    res.status(500).json({ error: 'Failed to send M2 invoice' });
+    res.status(500).json({ error: 'Failed to send M2 invoice: ' + err.message });
   }
 });
 
