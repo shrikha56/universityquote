@@ -228,6 +228,14 @@ app.get('/admin/api/quotes', (req, res) => {
   res.json({ platform: 'university', quotes: allQuotes });
 });
 
+// Admin API - mark quote as paid
+app.post('/admin/api/quotes/:slug/mark-paid', (req, res) => {
+  const quote = db.prepare('SELECT * FROM quotes WHERE slug = ?').get(req.params.slug);
+  if (!quote) return res.status(404).json({ error: 'Quote not found' });
+  db.prepare("UPDATE quotes SET status = 'paid' WHERE slug = ?").run(req.params.slug);
+  res.json({ success: true });
+});
+
 // Admin dashboard - track pending/abandoned quotes
 app.get('/admin/dashboard', (req, res) => {
   const now = new Date();
