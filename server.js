@@ -306,7 +306,7 @@ app.post('/generate-quote', async (req, res) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        secret: process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAACvmCvz5iC3Ar48jKQV6tNOW6AE',
+        secret: process.env.TURNSTILE_SECRET_KEY,
         response: turnstileToken,
         remoteip: req.ip,
       }),
