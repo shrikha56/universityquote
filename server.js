@@ -207,6 +207,27 @@ app.get('/xero/callback', async (req, res) => {
 
 // ===== ADMIN ROUTES =====
 
+// CORS for combined admin panel
+app.use('/admin/api', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  if (req.method === 'OPTIONS') return res.sendStatus(200);
+  next();
+});
+
+// Admin API - JSON endpoint for combined admin panel
+app.get('/admin/api/quotes', (req, res) => {
+  const allQuotes = db.prepare(`
+    SELECT *,
+      julianday('now') - julianday(created_at) as days_old,
+      julianday('now') - julianday(last_viewed_at) as days_since_view
+    FROM quotes
+    ORDER BY created_at DESC
+  `).all();
+  res.json({ platform: 'university', quotes: allQuotes });
+});
+
 // Admin dashboard - track pending/abandoned quotes
 app.get('/admin/dashboard', (req, res) => {
   const now = new Date();
