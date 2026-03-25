@@ -159,9 +159,11 @@
     const body = {};
     data.forEach((v, k) => body[k] = v);
 
-    // Include Turnstile token
+    // Include Turnstile token (if widget loaded)
     const turnstileInput = form.querySelector('[name="cf-turnstile-response"]');
-    if (turnstileInput) body['cf-turnstile-response'] = turnstileInput.value;
+    if (turnstileInput && turnstileInput.value) {
+      body['cf-turnstile-response'] = turnstileInput.value;
+    }
 
     try {
       const res = await fetch('/generate-quote', {

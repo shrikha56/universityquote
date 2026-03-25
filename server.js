@@ -296,28 +296,29 @@ app.get('/', (req, res) => {
 
 // Generate quote
 app.post('/generate-quote', async (req, res) => {
-  // Verify Cloudflare Turnstile
+  // Verify Cloudflare Turnstile (if token provided)
   const turnstileToken = req.body['cf-turnstile-response'];
-  if (!turnstileToken) {
-    return res.status(400).json({ error: 'Please complete the human verification.' });
-  }
-  try {
-    const turnstileRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        secret: process.env.TURNSTILE_SECRET_KEY,
-        response: turnstileToken,
-        remoteip: req.ip,
-      }),
-    });
-    const turnstileData = await turnstileRes.json();
-    if (!turnstileData.success) {
-      return res.status(403).json({ error: 'Human verification failed. Please try again.' });
+  if (turnstileToken) {
+    try {
+      const turnstileRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          secret: process.env.TURNSTILE_SECRET_KEY,
+          response: turnstileToken,
+          remoteip: req.ip,
+        }),
+      });
+      const turnstileData = await turnstileRes.json();
+      if (!turnstileData.success) {
+        return res.status(403).json({ error: 'Human verification failed. Please try again.' });
+      }
+    } catch (err) {
+      console.error('Turnstile verification error:', err.message);
+      // Allow through if Cloudflare is unreachable
     }
-  } catch (err) {
-    console.error('Turnstile verification error:', err.message);
-    return res.status(500).json({ error: 'Verification service unavailable. Please try again.' });
+  } else {
+    console.warn('Turnstile token missing — widget may not have loaded for this user');
   }
 
   const { contact_name, contact_email, company_name, pin_code,
