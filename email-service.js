@@ -222,10 +222,16 @@ async function sendAcceptanceEmail(quote, pdfBuffer, xeroPaymentUrl) {
               <p style="margin: 4px 0; font-size: 0.9em; color: #555;">2. Arrange payment per the terms outlined</p>
               <p style="margin: 4px 0; font-size: 0.9em; color: #555;">3. Book your kickoff meeting with our deployment team</p>
             </div>
-            <div style="text-align: center; margin: 32px 0;">
-              <a href="${proposalUrl}" style="display: inline-block; background: #1a3a5c; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 1em; margin-right: 12px;">View Proposal Online</a>
-              ${xeroPaymentUrl ? `<a href="${xeroPaymentUrl}" style="display: inline-block; background: #1a8a4a; color: white; padding: 16px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 1em;">Make Payment</a>` : ''}
-            </div>
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin: 32px auto;">
+              <tr>
+                <td style="padding-right: 8px;">
+                  <a href="${proposalUrl}" style="display: inline-block; background: #1a3a5c; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 1em;">View Proposal Online</a>
+                </td>
+                ${xeroPaymentUrl ? `<td style="padding-left: 8px;">
+                  <a href="${xeroPaymentUrl}" style="display: inline-block; background: #1a8a4a; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 1em;">Make Payment</a>
+                </td>` : ''}
+              </tr>
+            </table>
             <p style="color: #555;">Questions? Contact <a href="mailto:accounts@place.technology" style="color: #4a90d9;">accounts@place.technology</a></p>
             <p style="margin-top: 32px; color: #555;">Welcome aboard,<br><strong>PlaceOS Team</strong></p>
           </div>
