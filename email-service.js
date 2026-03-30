@@ -2,6 +2,7 @@ const { Resend } = require('resend');
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 const FROM_EMAIL = process.env.FROM_EMAIL || 'PlaceOS CampusOS <onboarding@resend.dev>';
+const ADMIN_EMAIL = 'sales@place.technology';
 
 // Send quote confirmation email when a proposal is generated
 async function sendQuoteEmail(quote) {
@@ -15,6 +16,7 @@ async function sendQuoteEmail(quote) {
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: quote.contact_email,
+      bcc: ADMIN_EMAIL,
       subject: `Your PlaceOS CampusOS Proposal for ${quote.company_name}`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -78,6 +80,7 @@ async function sendFollowUpEmail(quote) {
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: quote.contact_email,
+      bcc: ADMIN_EMAIL,
       subject: `${quote.contact_name}, still interested in PlaceOS CampusOS?`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -139,6 +142,7 @@ async function sendDownsellEmail(quote, discountPct) {
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: quote.contact_email,
+      bcc: ADMIN_EMAIL,
       subject: `Special ${discountPct}% Discount on Your PlaceOS CampusOS Proposal`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -199,6 +203,7 @@ async function sendAcceptanceEmail(quote, pdfBuffer, xeroPaymentUrl) {
     const { data, error } = await resend.emails.send({
       from: FROM_EMAIL,
       to: quote.contact_email,
+      bcc: ADMIN_EMAIL,
       subject: `Invoice ${quote.invoice_number} — PlaceOS CampusOS for ${quote.company_name}`,
       attachments,
       html: `
