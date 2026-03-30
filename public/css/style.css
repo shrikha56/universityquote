@@ -297,6 +297,15 @@ a { color: #4a90d9; text-decoration: none; }
   margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
 }
 .terms-header strong { font-size: 1.05em; color: #1a3a5c; }
+.terms-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.terms-toggle-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; background: white; color: #1a3a5c; border-radius: 6px;
+  font-size: 0.85em; font-weight: 600; border: 1.5px solid #1a3a5c;
+  cursor: pointer; transition: all 0.2s;
+}
+.terms-toggle-btn:hover { background: #f0f4f8; }
+.terms-toggle-btn.active { background: #1a3a5c; color: white; }
 .terms-download-btn {
   display: inline-flex; align-items: center; gap: 6px;
   padding: 8px 16px; background: #1a3a5c; color: white; border-radius: 6px;

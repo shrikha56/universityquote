@@ -231,12 +231,18 @@
     <div class="terms-section">
       <div class="terms-header">
         <strong>PlaceOS Terms of Use</strong>
-        <a href="/PlaceOS-Terms-of-Use.pdf" download class="terms-download-btn">
-          <i data-lucide="download" style="width:16px; height:16px;"></i>
-          Download PDF
-        </a>
+        <div class="terms-actions">
+          <button type="button" class="terms-toggle-btn" id="termsToggle">
+            <i data-lucide="file-text" style="width:16px; height:16px;"></i>
+            View Terms
+          </button>
+          <a href="/PlaceOS-Terms-of-Use.pdf" download class="terms-download-btn">
+            <i data-lucide="download" style="width:16px; height:16px;"></i>
+            Download PDF
+          </a>
+        </div>
       </div>
-      <div class="terms-scroll-box">
+      <div class="terms-scroll-box" id="termsContent" style="display:none;">
         <h3>Place Technology Group Pte. Ltd. — Terms of Use</h3>
         <h4>PlaceOS One Software as a Service Agreement</h4>
 
@@ -555,6 +561,22 @@
   });
 })();
 <% } %>
+</script>
+<script>
+  // Terms toggle
+  var toggleBtn = document.getElementById('termsToggle');
+  var termsContent = document.getElementById('termsContent');
+  if (toggleBtn && termsContent) {
+    toggleBtn.addEventListener('click', function() {
+      var isVisible = termsContent.style.display !== 'none';
+      termsContent.style.display = isVisible ? 'none' : 'block';
+      toggleBtn.classList.toggle('active', !isVisible);
+      toggleBtn.innerHTML = isVisible
+        ? '<i data-lucide="file-text" style="width:16px;height:16px;"></i> View Terms'
+        : '<i data-lucide="eye-off" style="width:16px;height:16px;"></i> Hide Terms';
+      lucide.createIcons();
+    });
+  }
 </script>
 <script>lucide.createIcons();</script>
 </body>
