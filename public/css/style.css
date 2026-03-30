@@ -289,49 +289,57 @@ a { color: #4a90d9; text-decoration: none; }
 
 /* ===== ACCEPTANCE / SIGNATURE ===== */
 .accept-section { text-align: center; }
-.accept-section .terms-section {
-  text-align: left; margin: 20px 0;
+/* Terms Card */
+.terms-card {
+  text-align: left; margin: 24px 0; border: 1px solid #e0e3e8; border-radius: 10px;
+  overflow: hidden; background: white; transition: box-shadow 0.2s;
 }
-.terms-header {
+.terms-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+.terms-card.expanded { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+.terms-card-header {
   display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 12px; flex-wrap: wrap; gap: 8px;
+  padding: 16px 20px; cursor: pointer; user-select: none;
+  background: #f8f9fb; border-bottom: 1px solid transparent;
+  transition: background 0.2s;
 }
-.terms-header strong { font-size: 1.05em; color: #1a3a5c; }
-.terms-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-.terms-toggle-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 16px; background: white; color: #1a3a5c; border-radius: 6px;
-  font-size: 0.85em; font-weight: 600; border: 1.5px solid #1a3a5c;
-  cursor: pointer; transition: all 0.2s;
+.terms-card.expanded .terms-card-header { border-bottom-color: #e0e3e8; }
+.terms-card-header:hover { background: #f0f2f6; }
+.terms-card-title {
+  display: flex; align-items: center; gap: 10px; font-size: 0.95em; color: #1a3a5c;
 }
-.terms-toggle-btn:hover { background: #f0f4f8; }
-.terms-toggle-btn.active { background: #1a3a5c; color: white; }
+.terms-card-actions { display: flex; align-items: center; gap: 10px; }
 .terms-download-btn {
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 8px 16px; background: #1a3a5c; color: white; border-radius: 6px;
-  font-size: 0.85em; font-weight: 600; transition: background 0.2s;
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px; background: #1a3a5c; color: white; border-radius: 5px;
+  font-size: 0.78em; font-weight: 600; transition: background 0.2s; text-decoration: none;
 }
 .terms-download-btn:hover { background: #2c5580; color: white; }
-.terms-scroll-box {
-  background: #f9fafb; padding: 24px; border-radius: 8px;
-  max-height: 350px; overflow-y: auto; font-size: 0.88em; color: #444;
-  border: 1px solid #d8dbe2; line-height: 1.7;
+.terms-chevron {
+  display: flex; align-items: center; color: #999; transition: transform 0.3s ease;
 }
-.terms-scroll-box h3 { font-size: 1.1em; color: #1a3a5c; margin-bottom: 4px; }
-.terms-scroll-box h4 { font-size: 1em; color: #1a3a5c; margin: 18px 0 6px; }
+.terms-scroll-box {
+  padding: 20px 24px; max-height: 300px; overflow-y: auto;
+  font-size: 0.85em; color: #555; line-height: 1.7;
+  border-top: none;
+}
+.terms-scroll-box::-webkit-scrollbar { width: 6px; }
+.terms-scroll-box::-webkit-scrollbar-track { background: #f5f5f5; }
+.terms-scroll-box::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+.terms-scroll-box::-webkit-scrollbar-thumb:hover { background: #aaa; }
+.terms-scroll-box h3 { font-size: 1.05em; color: #1a3a5c; margin-bottom: 4px; }
+.terms-scroll-box h4 { font-size: 0.95em; color: #1a3a5c; margin: 16px 0 6px; font-weight: 600; }
 .terms-scroll-box p { margin-bottom: 8px; }
-.terms-scroll-box ul { margin: 8px 0 12px 20px; }
-.terms-scroll-box ul li { margin-bottom: 6px; }
+.terms-scroll-box ul { margin: 6px 0 10px 18px; }
+.terms-scroll-box ul li { margin-bottom: 4px; }
 .terms-accept-row {
-  margin-top: 16px; padding: 14px 16px; background: #eef3fb; border-radius: 8px;
-  border: 1px solid #c8d8ee;
+  padding: 14px 20px; background: #f8f9fb; border-top: 1px solid #e0e3e8;
 }
 .terms-checkbox-label {
-  display: flex; align-items: flex-start; gap: 10px; cursor: pointer;
-  font-size: 0.93em; color: #333; font-weight: 500;
+  display: flex; align-items: center; gap: 10px; cursor: pointer;
+  font-size: 0.9em; color: #333; font-weight: 500;
 }
 .terms-checkbox-label input[type="checkbox"] {
-  width: 18px; height: 18px; margin-top: 2px; accent-color: #1a3a5c; cursor: pointer;
+  width: 17px; height: 17px; accent-color: #1a3a5c; cursor: pointer; flex-shrink: 0;
 }
 .terms-checkbox-label a { color: #4a90d9; text-decoration: underline; }
 .sig-area {

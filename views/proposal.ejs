@@ -228,18 +228,18 @@
       </div>
     </div>
 
-    <div class="terms-section">
-      <div class="terms-header">
-        <strong>PlaceOS Terms of Use</strong>
-        <div class="terms-actions">
-          <button type="button" class="terms-toggle-btn" id="termsToggle">
-            <i data-lucide="file-text" style="width:16px; height:16px;"></i>
-            View Terms
-          </button>
-          <a href="/PlaceOS-Terms-of-Use.pdf" download class="terms-download-btn">
-            <i data-lucide="download" style="width:16px; height:16px;"></i>
-            Download PDF
+    <div class="terms-card">
+      <div class="terms-card-header" id="termsToggle">
+        <div class="terms-card-title">
+          <i data-lucide="shield-check" style="width:20px; height:20px; color:#1a3a5c;"></i>
+          <strong>PlaceOS Terms of Use</strong>
+        </div>
+        <div class="terms-card-actions">
+          <a href="/PlaceOS-Terms-of-Use.pdf" download class="terms-download-btn" onclick="event.stopPropagation();">
+            <i data-lucide="download" style="width:14px; height:14px;"></i>
+            PDF
           </a>
+          <span class="terms-chevron" id="termsChevron"><i data-lucide="chevron-down" style="width:20px; height:20px;"></i></span>
         </div>
       </div>
       <div class="terms-scroll-box" id="termsContent" style="display:none;">
@@ -385,7 +385,7 @@
           <span>I have read and agree to the <a href="/PlaceOS-Terms-of-Use.pdf" target="_blank">PlaceOS Terms of Use</a></span>
         </label>
       </div>
-    </div>
+    </div><!-- /terms-card -->
 
     <div class="sig-area">
       <label for="sigName">Your Full Name</label>
@@ -566,15 +566,13 @@
   // Terms toggle
   var toggleBtn = document.getElementById('termsToggle');
   var termsContent = document.getElementById('termsContent');
+  var chevron = document.getElementById('termsChevron');
   if (toggleBtn && termsContent) {
     toggleBtn.addEventListener('click', function() {
       var isVisible = termsContent.style.display !== 'none';
       termsContent.style.display = isVisible ? 'none' : 'block';
-      toggleBtn.classList.toggle('active', !isVisible);
-      toggleBtn.innerHTML = isVisible
-        ? '<i data-lucide="file-text" style="width:16px;height:16px;"></i> View Terms'
-        : '<i data-lucide="eye-off" style="width:16px;height:16px;"></i> Hide Terms';
-      lucide.createIcons();
+      chevron.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(180deg)';
+      toggleBtn.closest('.terms-card').classList.toggle('expanded', !isVisible);
     });
   }
 </script>
