@@ -249,6 +249,90 @@ async function sendAcceptanceEmail(quote, pdfBuffer, xeroPaymentUrl) {
   }
 }
 
+// Send admin notification email to sales team
+async function sendAdminNotification(event, quote) {
+  if (!resend) return false;
+
+  const proposalUrl = `${process.env.BASE_URL}/${quote.slug}`;
+  const adminDashUrl = process.env.BASE_URL + '/admin/dashboard';
+
+  const subjects = {
+    new_quote: `New Quote: ${quote.company_name} — $${quote.total_annual?.toLocaleString() || '0'}/yr`,
+    accepted: `Quote Accepted: ${quote.company_name} — ${quote.signature_name || quote.contact_name}`,
+    expired: `Quote Expired: ${quote.company_name} (no action taken)`,
+  };
+
+  const bodies = {
+    new_quote: `
+      <p>A new CampusOS quote has been generated.</p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <tr><td style="padding:8px; color:#888; width:140px;">Company</td><td style="padding:8px; font-weight:600;">${quote.company_name}</td></tr>
+        <tr style="background:#f9fafb;"><td style="padding:8px; color:#888;">Contact</td><td style="padding:8px;">${quote.contact_name} (${quote.contact_email})</td></tr>
+        <tr><td style="padding:8px; color:#888;">Annual Licence</td><td style="padding:8px; font-weight:600; color:#1a8a4a;">$${quote.total_annual?.toLocaleString() || '0'} USD</td></tr>
+        <tr style="background:#f9fafb;"><td style="padding:8px; color:#888;">Setup Fees</td><td style="padding:8px;">$${quote.setup_total?.toLocaleString() || '0'} USD</td></tr>
+        ${quote.num_bookable_spaces > 0 ? `<tr><td style="padding:8px; color:#888;">Bookable Spaces</td><td style="padding:8px;">${quote.num_bookable_spaces}</td></tr>` : ''}
+        ${quote.num_parking_spaces > 0 ? `<tr style="background:#f9fafb;"><td style="padding:8px; color:#888;">Parking Spaces</td><td style="padding:8px;">${quote.num_parking_spaces}</td></tr>` : ''}
+        ${quote.num_floors > 0 ? `<tr><td style="padding:8px; color:#888;">Floors</td><td style="padding:8px;">${quote.num_floors}</td></tr>` : ''}
+        ${quote.num_av_rooms > 0 ? `<tr style="background:#f9fafb;"><td style="padding:8px; color:#888;">AV Rooms</td><td style="padding:8px;">${quote.num_av_rooms}</td></tr>` : ''}
+        ${quote.num_buildings > 0 ? `<tr><td style="padding:8px; color:#888;">Buildings</td><td style="padding:8px;">${quote.num_buildings}</td></tr>` : ''}
+      </table>`,
+    accepted: `
+      <p>A CampusOS quote has been <strong style="color:#1a8a4a;">accepted and signed</strong>.</p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <tr><td style="padding:8px; color:#888; width:140px;">Company</td><td style="padding:8px; font-weight:600;">${quote.company_name}</td></tr>
+        <tr style="background:#f9fafb;"><td style="padding:8px; color:#888;">Signed by</td><td style="padding:8px;">${quote.signature_name || quote.contact_name}</td></tr>
+        <tr><td style="padding:8px; color:#888;">Contact</td><td style="padding:8px;">${quote.contact_name} (${quote.contact_email})</td></tr>
+        <tr style="background:#f9fafb;"><td style="padding:8px; color:#888;">Annual Licence</td><td style="padding:8px; font-weight:600; color:#1a8a4a;">$${quote.total_annual?.toLocaleString() || '0'} USD</td></tr>
+        <tr><td style="padding:8px; color:#888;">Invoice</td><td style="padding:8px;">${quote.invoice_number || 'N/A'}</td></tr>
+        ${quote.early_bird_bonus ? '<tr style="background:#eef7f0;"><td style="padding:8px; color:#888;">Early Bird</td><td style="padding:8px; color:#1a8a4a; font-weight:600;">$2,000 credit applied</td></tr>' : ''}
+      </table>`,
+    expired: `
+      <p>A CampusOS quote has <strong style="color:#d4a017;">expired</strong> without being accepted.</p>
+      <table style="width:100%; border-collapse:collapse; margin:16px 0;">
+        <tr><td style="padding:8px; color:#888; width:140px;">Company</td><td style="padding:8px; font-weight:600;">${quote.company_name}</td></tr>
+        <tr style="background:#f9fafb;"><td style="padding:8px; color:#888;">Contact</td><td style="padding:8px;">${quote.contact_name} (${quote.contact_email})</td></tr>
+        <tr><td style="padding:8px; color:#888;">Annual Value</td><td style="padding:8px;">$${quote.total_annual?.toLocaleString() || '0'} USD</td></tr>
+        <tr style="background:#f9fafb;"><td style="padding:8px; color:#888;">Created</td><td style="padding:8px;">${quote.created_at || 'N/A'}</td></tr>
+      </table>
+      <p style="color:#666; font-size:0.9em;">Consider sending a follow-up or downsell offer from the admin dashboard.</p>`,
+  };
+
+  const eventLabels = { new_quote: 'New Quote', accepted: 'Accepted', expired: 'Expired' };
+  const eventColors = { new_quote: '#4a90d9', accepted: '#1a8a4a', expired: '#d4a017' };
+
+  try {
+    const { data, error } = await resend.emails.send({
+      from: FROM_EMAIL,
+      to: ADMIN_EMAIL,
+      subject: subjects[event] || `Quote Update: ${quote.company_name}`,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: #1a3a5c; padding: 30px 40px; color: white;">
+            <div style="font-size: 1.4em; font-weight: 700; letter-spacing: -0.5px;">Place<span style="opacity:0.6; font-weight:300;">OS</span> <span style="font-weight:300; font-size:0.7em; opacity:0.6;">CampusOS Sales</span></div>
+          </div>
+          <div style="padding: 32px 40px; background: white; border: 1px solid #e8e9ed;">
+            <div style="display:inline-block; padding:4px 12px; background:${eventColors[event]}; color:white; border-radius:4px; font-size:0.8em; font-weight:600; margin-bottom:16px;">${eventLabels[event]}</div>
+            ${bodies[event]}
+            <div style="margin-top:24px; display:flex; gap:12px;">
+              <a href="${proposalUrl}" style="display:inline-block; padding:10px 24px; background:#1a3a5c; color:white; border-radius:6px; font-weight:600; font-size:0.9em; text-decoration:none;">View Proposal</a>
+              <a href="${adminDashUrl}" style="display:inline-block; padding:10px 24px; background:white; color:#1a3a5c; border:1.5px solid #1a3a5c; border-radius:6px; font-weight:600; font-size:0.9em; text-decoration:none;">Admin Dashboard</a>
+            </div>
+          </div>
+          <div style="background: #f5f6f8; padding: 16px 40px; text-align: center; font-size: 0.8em; color: #999;">
+            PlaceOS CampusOS Admin Notification · sales@place.technology
+          </div>
+        </div>
+      `
+    });
+    if (error) { console.error(`Admin notification error (${event}):`, error); return false; }
+    console.log(`Admin notification (${event}) sent for ${quote.company_name}`);
+    return true;
+  } catch (error) {
+    console.error(`Error sending admin notification (${event}):`, error.message);
+    return false;
+  }
+}
+
 // Test email configuration
 async function testEmailConfig() {
   if (!process.env.RESEND_API_KEY) {
@@ -264,5 +348,6 @@ module.exports = {
   sendAcceptanceEmail,
   sendFollowUpEmail,
   sendDownsellEmail,
+  sendAdminNotification,
   testEmailConfig
 };

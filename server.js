@@ -4,7 +4,7 @@ const path = require('path');
 const Database = require('better-sqlite3');
 const fs = require('fs');
 const { xero, initializeXero, saveTokens, createXeroQuote, convertQuoteToInvoice, emailInvoice, getOrganisationDetails, getBankAccount, getInvoicePdf, getOnlineInvoiceUrl } = require('./xero-integration');
-const { sendQuoteEmail, sendFollowUpEmail, sendDownsellEmail, testEmailConfig } = require('./email-service');
+const { sendQuoteEmail, sendFollowUpEmail, sendDownsellEmail, sendAdminNotification, testEmailConfig } = require('./email-service');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -449,6 +449,9 @@ app.post('/generate-quote', async (req, res) => {
 
     // Send confirmation email (non-blocking)
     sendQuoteEmail(quoteData).catch(err => console.error('Quote email failed:', err.message));
+
+    // Notify sales team
+    sendAdminNotification('new_quote', quoteData).catch(err => console.error('Admin notification failed:', err.message));
   }
 
   res.json({ success: true, slug });
@@ -569,6 +572,10 @@ app.post('/:slug/accept', async (req, res) => {
     orgDetails?.addresses?.[0] ? JSON.stringify(orgDetails.addresses[0]) : null,
     req.params.slug
   );
+
+  // Notify sales team of acceptance
+  const acceptedQuote = db.prepare('SELECT * FROM quotes WHERE slug = ?').get(req.params.slug);
+  sendAdminNotification('accepted', acceptedQuote).catch(err => console.error('Admin accept notification failed:', err.message));
 
   res.json({ success: true, invoice_number, earlyBirdBonus });
 });
